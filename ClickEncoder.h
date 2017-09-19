@@ -15,9 +15,11 @@
 // ----------------------------------------------------------------------------
 
 #include <stdint.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
+#if !defined (__STM32F1__)	
+	#include <avr/io.h>
+	#include <avr/interrupt.h>
+	#include <avr/pgmspace.h>
+#endif
 #include "Arduino.h"
 
 // ----------------------------------------------------------------------------
@@ -94,26 +96,29 @@ public:
     return accelerationEnabled;
   }
 
-private:
+private:  
   const uint8_t pinA;
   const uint8_t pinB;
   const uint8_t pinBTN;
   const bool pinsActive;
   volatile int16_t delta;
   volatile int16_t last;
+  volatile uint16_t acceleration;  
+  bool  accelerationEnabled;
   uint8_t steps;
-  volatile uint16_t acceleration;
-  bool accelerationEnabled;
+
+#ifndef WITHOUT_BUTTON
+  volatile Button button;
+  unsigned long lastButtonCheck = 0;
+  uint8_t doubleClickTicks = 0;     
+  bool doubleClickEnabled;  
+  uint16_t keyDownTicks = 0;    
+#endif
+
 #if ENC_DECODER != ENC_NORMAL
   static const int8_t table[16];
 #endif
-#ifndef WITHOUT_BUTTON
-  volatile Button button;
-  bool doubleClickEnabled;
-  uint16_t keyDownTicks = 0;
-  uint8_t doubleClickTicks = 0;
-  unsigned long lastButtonCheck = 0;
-#endif
+
 };
 
 // ----------------------------------------------------------------------------
